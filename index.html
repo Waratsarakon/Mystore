@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f6f6">
+  <title>PHARMACY LEDGER — WORKSHOP</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400&family=Jost:wght@400&display=swap');
+
+    :root { --canvas:#f6f6f6; --surface-1:#ebebeb; --surface-2:#fff; --ink:#000; --ink-70:rgba(0,0,0,.7); --ink-50:rgba(0,0,0,.5); --hairline:rgba(0,0,0,.1); --hairline-strong:rgba(0,0,0,.45); --focus:#2b83e9; --font-main:'Jost','IBM Plex Sans Thai','Helvetica Neue',Arial,sans-serif; }
+    * { box-sizing:border-box; border-radius:0 !important; box-shadow:none !important; font-weight:400 !important; }
+    body { margin:0; min-height:100vh; padding:0 0 20px; background:var(--canvas); color:var(--ink); font-family:var(--font-main); font-size:14px; line-height:1.5; letter-spacing:.01em; -webkit-font-smoothing:antialiased; }
+    body::before { content:'PHARMACY LEDGER'; display:flex; align-items:center; height:48px; padding:0 24px; border-bottom:1px solid var(--hairline-strong); font-size:16px; letter-spacing:.14em; }
+    main { width:min(100%,1040px); margin:0 auto; }
+    header { margin:0; padding:54px 24px 34px; border-bottom:1px solid var(--hairline-strong); }
+    h1 { margin:0 0 10px; font-size:clamp(28px,5vw,42px); line-height:1.2; letter-spacing:.015em; }
+    .subtitle { margin:0; color:var(--ink-70); font-size:15px; line-height:1.7; }
+    nav { display:grid; gap:0; }
+    .nav-link { display:grid; grid-template-columns:56px minmax(0,1fr) 24px; min-height:104px; align-items:center; justify-content:initial; gap:18px; padding:18px 24px; border:0; border-bottom:1px solid var(--hairline); background:var(--canvas); color:var(--ink); text-decoration:none; transition:background .15s ease; }
+    .nav-link::before { counter-increment:menu; content:counter(menu,decimal-leading-zero); color:var(--ink-50); font-size:12px; letter-spacing:.1em; }
+    nav#main-menu { counter-reset:menu; }
+    .nav-link:hover,.nav-link:focus-visible { border-color:var(--hairline); background:var(--surface-1); outline:none; }
+    .nav-link:focus-visible { box-shadow:inset 0 0 0 2px var(--focus) !important; }
+    .link-copy { min-width:0; }
+    .link-title { display:block; margin-bottom:5px; font-size:18px; line-height:1.4; letter-spacing:.025em; }
+    .link-desc { display:block; color:var(--ink-70); font-size:13px; line-height:1.6; }
+    .arrow { justify-self:end; color:var(--ink-70); font-size:20px; }
+    footer { margin-top:0; padding:18px 24px 28px; border:0; border-top:1px solid var(--hairline-strong); border-radius:0; color:var(--ink-50); font-size:12px; line-height:1.7; text-align:center; }
+    @media (max-width:600px) { body::before { padding:0 16px; font-size:13px; } header { padding:38px 18px 26px; } .nav-link { grid-template-columns:38px minmax(0,1fr) 18px; gap:12px; min-height:96px; padding:16px 18px; } .link-title { font-size:16px; } .link-desc { font-size:12px; } footer { padding:18px; } }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none!important; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Workshop ร้านยาจำลอง</h1>
+      <p class="subtitle">เลือกเมนูที่ต้องการใช้งาน</p>
+    </header>
+    <nav id="main-menu" aria-label="เมนูหลัก"></nav>
+    <footer>ข้อมูลทั้งหมดเป็นข้อมูลจำลอง ห้ามใส่ชื่อผู้ป่วยจริง</footer>
+  </main>
+  <script>
+    // เพิ่มหรือลบเมนูได้โดยแก้รายการเพียงบรรทัดเดียวในอาร์เรย์นี้
+    const links = [
+      { href:"pos.html", title:"หน้าขายยา", desc:"เลือกยา กรอกจำนวน บันทึกการจ่ายยา" },
+      { href:"admin.html", title:"จัดการระบบ (ผู้ดูแล)", desc:"บัญชียา คลังรายล็อต รายการจ่าย ต้องใช้รหัสผู้ดูแล" },
+      { href:"dashboard.html", title:"Dashboard คลังยา", desc:"ภาพรวมคลัง ล็อตใกล้หมดอายุ ยาต่ำกว่าจุดสั่งซื้อ" },
+      { href:"status.html", title:"ตรวจสถานะระบบ", desc:"ตรวจว่าการเชื่อมต่อแต่ละส่วนทำงานปกติ" }
+    ];
+
+    const menu = document.getElementById("main-menu");
+    links.forEach(({ href, title, desc }) => {
+      const link = document.createElement("a");
+      link.className = "nav-link";
+      link.href = href;
+
+      const copy = document.createElement("span");
+      copy.className = "link-copy";
+      const heading = document.createElement("span");
+      heading.className = "link-title";
+      heading.textContent = title;
+      const description = document.createElement("span");
+      description.className = "link-desc";
+      description.textContent = desc;
+      const arrow = document.createElement("span");
+      arrow.className = "arrow";
+      arrow.setAttribute("aria-hidden", "true");
+      arrow.textContent = "›";
+
+      copy.append(heading, description);
+      link.append(copy, arrow);
+      menu.append(link);
+    });
+  </script>
+</body>
+</html>
