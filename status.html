@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PHARMACY LEDGER — SYSTEM STATUS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400&family=Jost:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --canvas: #f6f6f6;
+    --surface-1: #ebebeb;
+    --surface-2: #ffffff;
+    --ink: #000000;
+    --ink-70: rgba(0, 0, 0, 0.7);
+    --ink-50: rgba(0, 0, 0, 0.5);
+    --hairline: rgba(0, 0, 0, 0.1);
+    --hairline-strong: rgba(0, 0, 0, 0.45);
+    --error: #ae3433;
+    --warning: #d87d41;
+    --success: #56923b;
+    --focus: #2b83e9;
+    --font-main: 'Jost', 'IBM Plex Sans Thai', 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    font-weight: 400 !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-main);
+    font-size: 14px;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Navigation Bar - 48px */
+  .topbar {
+    height: 48px;
+    border-bottom: 1px solid var(--hairline-strong);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    background: var(--canvas);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .brand-group { display: flex; align-items: center; gap: 24px; height: 100%; }
+  .brand-title {
+    font-size: 16px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border-right: 1px solid var(--hairline);
+    padding-right: 24px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+  .nav-links { display: flex; height: 100%; }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+    height: 100%;
+    text-decoration: none;
+    color: var(--ink);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-right: 1px solid var(--hairline);
+    transition: background 0.15s;
+  }
+  .nav-link:hover { background: var(--surface-1); }
+  .nav-link.active { background: var(--ink); color: var(--canvas); }
+  .topbar-status {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* Location warning strip */
+  .banner {
+    display: none;
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--hairline-strong);
+    background: var(--surface-2);
+    font-size: 13px;
+  }
+  .banner.show { display: block; }
+  .banner.warn { border-left: 4px solid var(--warning); }
+
+  /* Page heading */
+  .page-head {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--hairline-strong);
+  }
+  .page-head h1 {
+    font-size: 24px;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+    margin-bottom: 4px;
+  }
+  .sub { color: var(--ink-70); font-size: 13px; }
+
+  /* Control strip */
+  .control-bar {
+    border-bottom: 1px solid var(--hairline-strong);
+    background: var(--surface-1);
+    padding: 12px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .control-group { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+  .control-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 2px;
+  }
+  label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
+  input[type=password] {
+    background: var(--canvas);
+    border: 1px solid var(--hairline-strong);
+    color: var(--ink);
+    font-family: var(--font-main);
+    font-size: 13px;
+    padding: 6px 10px;
+    height: 34px;
+    min-width: 260px;
+    outline: none;
+  }
+  input:focus { border-color: var(--focus); }
+
+  .btn, button {
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    color: var(--canvas);
+    font-family: var(--font-main);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0 16px;
+    height: 34px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+  }
+  button:hover { background: #222222; }
+  button:disabled { opacity: .5; cursor: wait; }
+
+  .summary { font-size: 13px; letter-spacing: 0.06em; }
+  .note {
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--hairline);
+    background: var(--surface-2);
+    color: var(--ink-70);
+    font-size: 12px;
+  }
+  code {
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 12px;
+    background: var(--surface-1);
+    border: 1px solid var(--hairline);
+    padding: 0 5px;
+  }
+
+  /* Section header */
+  .section-header {
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--hairline-strong);
+    background: var(--surface-1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Check ledger rows */
+  ol.checks { list-style: none; background: var(--canvas); }
+  .check {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--hairline);
+    display: grid;
+    grid-template-columns: 20px 1fr auto;
+    gap: 4px 16px;
+    align-items: start;
+    transition: background 0.12s;
+  }
+  .check:hover { background: var(--surface-1); }
+
+  .lamp {
+    width: 12px;
+    height: 12px;
+    margin-top: 6px;
+    background: var(--ink-50);
+    border: 1px solid var(--ink-50);
+  }
+  .check.ok .lamp   { background: var(--success); border-color: var(--success); }
+  .check.bad .lamp  { background: var(--error);   border-color: var(--error); }
+  .check.skip .lamp { background: var(--canvas);  border-color: var(--hairline-strong); }
+
+  .title { font-size: 14px; letter-spacing: 0.04em; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid var(--ink-50);
+    color: var(--ink-70);
+    white-space: nowrap;
+    height: fit-content;
+  }
+  .check.ok .badge  { border-color: var(--success); color: var(--success); }
+  .check.bad .badge { border-color: var(--error); color: var(--error); }
+
+  .detail, .hint { grid-column: 2 / 4; font-size: 13px; }
+  .detail { color: var(--ink-70); }
+  .hint {
+    display: none;
+    color: var(--error);
+    border-left: 2px solid var(--error);
+    padding-left: 10px;
+    margin-top: 4px;
+  }
+  .check.bad .hint { display: block; }
+
+  @media (max-width: 1024px) {
+    .topbar { padding: 0 12px; }
+    .brand-title { padding-right: 12px; font-size: 14px; }
+    .topbar-status { display: none; }
+    .page-head, .control-bar, .note, .section-header, .check { padding-left: 12px; padding-right: 12px; }
+    input[type=password] { min-width: 0; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- TOP NAVIGATION -->
+  <header class="topbar">
+    <div class="brand-group">
+      <div class="brand-title">PHARMACY LEDGER</div>
+      <nav class="nav-links">
+        <a href="dashboard1.html" class="nav-link">← DASHBOARD</a>
+        <a href="#current" class="nav-link active">SYSTEM STATUS</a>
+      </nav>
+    </div>
+    <div class="topbar-status">
+      <span>API CHECK: 5 LAMPS</span>
+      <span>|</span>
+      <span>READ-ONLY</span>
+    </div>
+  </header>
+
+  <div id="where" class="banner warn"></div>
+
+  <div class="page-head">
+    <h1>ไฟสถานะระบบร้านยาจำลอง</h1>
+    <p class="sub">ตรวจว่า API ทั้ง 3 ไฟล์บน Vercel เชื่อมกับ Supabase ได้ครบ ทุกการตรวจ<strong>ไม่เปลี่ยนข้อมูล</strong>ในฐานข้อมูล</p>
+  </div>
+
+  <!-- CONTROL STRIP -->
+  <section class="control-bar">
+    <div class="control-group">
+      <div>
+        <label class="control-label" for="code">ADMIN CODE (รหัสผู้ดูแล)</label>
+        <input id="code" type="password" autocomplete="off" placeholder="ใช้เฉพาะไฟดวงที่ 5 เว้นว่างได้">
+      </div>
+    </div>
+    <div class="control-group">
+      <span id="summary" class="summary"></span>
+      <button id="run">ตรวจทั้งหมด</button>
+    </div>
+  </section>
+  <p class="note">รหัสถูกส่งไปที่ <code>/api/admin</code> ทาง header เท่านั้น หน้านี้ไม่บันทึกรหัสไว้ที่ใด ปิดแท็บแล้วรหัสหายไป</p>
+
+  <div class="section-header">
+    <span>CONNECTION CHECKLIST (รายการตรวจการเชื่อมต่อ)</span>
+    <span>5 CHECKS</span>
+  </div>
+  <ol class="checks" id="checks"></ol>
+
+<script>
+// ---------- รายการไฟ ----------
+const CHECKS = [
+  { id: 'data',     title: '1. อ่านข้อมูลได้ (api/data.js)' },
+  { id: 'catalog',  title: '2. มีบัญชียาจาก v_drug_catalog (crud.sql)' },
+  { id: 'dispense', title: '3. มีไฟล์ขายยา (api/dispense.js)' },
+  { id: 'guard',    title: '4. รหัสผิดต้องถูกปฏิเสธ (api/admin.js)' },
+  { id: 'admin',    title: '5. รหัสถูกและเชื่อมฐานข้อมูลได้ (ADMIN_CODE + secret key)' },
+];
+
+const list = document.getElementById('checks');
+for (const c of CHECKS) {
+  const li = document.createElement('li');
+  li.className = 'check';
+  li.id = 'c-' + c.id;
+  li.innerHTML = '<span class="lamp" aria-hidden="true"></span><span class="title"></span>' +
+                 '<span class="badge">ยังไม่ตรวจ</span><span class="detail"></span><span class="hint"></span>';
+  li.querySelector('.title').textContent = c.title;
+  list.appendChild(li);
+}
+
+function setLamp(id, state, detail, hint) {
+  const li = document.getElementById('c-' + id);
+  li.className = 'check ' + state;
+  li.querySelector('.badge').textContent =
+    { ok: 'ผ่าน', bad: 'ไม่ผ่าน', skip: 'ข้าม', wait: 'กำลังตรวจ…' }[state] || state;
+  li.querySelector('.detail').textContent = detail || '';
+  li.querySelector('.hint').textContent = hint ? 'วิธีแก้: ' + hint : '';
+}
+
+// เรียก API แล้วคืน { status, json, isHtml } โดยไม่โยน error
+async function call(path, opt) {
+  try {
+    const r = await fetch(path, { cache: 'no-store', ...opt });
+    const text = await r.text();
+    let json = null;
+    try { json = JSON.parse(text); } catch {}
+    return { status: r.status, json, isHtml: !json && /<html|<!doctype/i.test(text) };
+  } catch (e) {
+    return { status: 0, json: null, error: String(e) };
+  }
+}
+
+const NOT_DEPLOYED = 'ไม่พบ API ที่ path นี้ ตรวจว่าเปิดหน้านี้บนลิงก์ vercel.app และไฟล์อยู่ในโฟลเดอร์ api/ ที่รากของ repo';
+
+// ---------- ไฟแต่ละดวง ----------
+async function checkData() {
+  const r = await call('/api/data');
+  if (r.status === 200 && r.json && r.json.drugs && r.json.stock && r.json.dispense_log) {
+    const m = r.json.drugs.meta || {};
+    setLamp('data', 'ok', `ยา ${r.json.drugs.items.length} รายการ · ล็อต ${r.json.stock.items.length} ล็อต · ` +
+      `รายการจ่าย ${r.json.dispense_log.items.length} รายการ · วันอ้างอิง ${m.as_of || '-'}`);
+    return r.json;
+  }
+  if (r.status === 404 || r.isHtml) setLamp('data', 'bad', `ได้ ${r.status || 'เชื่อมต่อไม่ได้'}`, NOT_DEPLOYED);
+  else if (r.status === 500) setLamp('data', 'bad', (r.json && r.json.error) || 'ได้ 500',
+    'เพิ่ม SUPABASE_URL และ SUPABASE_PUBLISHABLE_KEY ใน Vercel แล้ว Redeploy');
+  else if (r.status === 502) setLamp('data', 'bad', (r.json && r.json.error) || 'ได้ 502',
+    'ตรวจค่า SUPABASE_URL และ publishable key (ขึ้นต้น sb_publishable_) และรัน schema → seed → sell_drug → crud ใน Supabase แล้วหรือยัง');
+  else setLamp('data', 'bad', `ได้ ${r.status || 'เชื่อมต่อไม่ได้'} ${r.error || ''}`, 'ตรวจ Logs ของ deploy ใน Vercel');
+  return null;
+}
+
+function checkCatalog(data) {
+  if (!data) return setLamp('catalog', 'skip', 'ข้ามเพราะไฟดวงที่ 1 ยังไม่ผ่าน');
+  const cat = data.catalog;
+  if (!cat && data.catalog_error) return setLamp('catalog', 'bad', data.catalog_error,
+    'เปิด Supabase SQL Editor แล้วรัน crud.sql (ต่อจาก schema → seed → sell_drug)');
+  if (!cat) return setLamp('catalog', 'bad', 'ไม่มีก้อน catalog ในผลของ /api/data',
+    'ใช้ api/data.js ฉบับที่เพิ่ม catalog (ไม่ใช่แม่แบบวันที่ 2) แล้ว push ใหม่');
+  const items = cat.items || [];
+  const hasCols = items.length && ['is_active', 'lot_count', 'usable_qty'].every(k => k in items[0]);
+  if (!hasCols) return setLamp('catalog', 'bad', 'catalog ไม่มีช่อง is_active / lot_count / usable_qty',
+    'รัน crud.sql ใน Supabase SQL Editor');
+  const inactive = items.filter(x => x.is_active === false).length;
+  const noLot = items.filter(x => x.lot_count === 0).length;
+  setLamp('catalog', 'ok', `ยาทั้งหมด ${items.length} รายการ · ยังไม่มีล็อต ${noLot} · ปิดใช้งาน ${inactive}`);
+}
+
+async function checkDispense() {
+  // GET ต้องได้ 405 (รับเฉพาะ POST) แปลว่าไฟล์อยู่และทำงาน โดยไม่ขายยาจริง
+  const r = await call('/api/dispense');
+  if (r.status === 405) return setLamp('dispense', 'ok', 'ตอบ 405 ตามที่ควร (รับเฉพาะ POST) ไม่มีการขายเกิดขึ้น');
+  if (r.status === 404 || r.isHtml) return setLamp('dispense', 'bad', `ได้ ${r.status}`, NOT_DEPLOYED);
+  setLamp('dispense', 'bad', `ได้ ${r.status || 'เชื่อมต่อไม่ได้'}`, 'ตรวจว่า api/dispense.js เป็นฉบับที่ส่งให้ และ Logs ใน Vercel');
+}
+
+async function checkGuard() {
+  const wrong = 'wrong-' + Math.random().toString(36).slice(2);
+  const r = await call('/api/admin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-code': wrong },
+    body: JSON.stringify({ action: 'dispense_void' }),
+  });
+  if (r.status === 401) return setLamp('guard', 'ok', 'รหัสผิดได้ 401 — ประตูล็อกอยู่');
+  if (r.status === 404 || r.isHtml) return setLamp('guard', 'bad', `ได้ ${r.status}`, NOT_DEPLOYED);
+  if (r.status === 500) return setLamp('guard', 'bad', (r.json && r.json.message) || 'ได้ 500',
+    'เพิ่ม SUPABASE_URL, SUPABASE_SECRET_KEY และ ADMIN_CODE ใน Vercel ให้ครบ แล้ว Redeploy');
+  setLamp('guard', 'bad', `ได้ ${r.status} ซึ่งไม่ควรเกิด`, 'ตรวจว่า api/admin.js เป็นฉบับที่ส่งให้ ไม่ได้ถูกแก้ส่วนตรวจรหัส');
+}
+
+async function checkAdmin(guardOk) {
+  const code = document.getElementById('code').value;
+  if (!code) return setLamp('admin', 'skip', 'ยังไม่ได้กรอกรหัสผู้ดูแล กรอกแล้วกดตรวจอีกครั้ง');
+  if (!guardOk) return setLamp('admin', 'skip', 'ข้ามเพราะไฟดวงที่ 4 ยังไม่ผ่าน');
+  // ขอยกเลิก D0014 ซึ่งมีอุบัติการณ์อ้างอยู่ ฐานข้อมูลต้องปฏิเสธเสมอ จึงไม่มีข้อมูลเปลี่ยน
+  const r = await call('/api/admin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-code': code },
+    body: JSON.stringify({ action: 'dispense_void', dispense_id: 'D0014', reason: 'ตรวจไฟสถานะ', by: 'STATUS' }),
+  });
+  const msg = (r.json && r.json.message) || '';
+  if (r.status === 400 && msg.includes('อุบัติการณ์'))
+    return setLamp('admin', 'ok', 'ฐานข้อมูลตอบ: ' + msg);
+  if (r.status === 401) return setLamp('admin', 'bad', 'รหัสผู้ดูแลไม่ตรงกับ ADMIN_CODE ใน Vercel',
+    'พิมพ์รหัสใหม่ ถ้ายังไม่ผ่าน ลบตัวแปร ADMIN_CODE แล้วพิมพ์ใหม่ (ระวังช่องว่างหรือขึ้นบรรทัดใหม่) และ Redeploy');
+  if (r.status === 502) return setLamp('admin', 'bad', msg || 'ได้ 502',
+    'รัน crud.sql ใน Supabase แล้วหรือยัง และตรวจ SUPABASE_SECRET_KEY (ขึ้นต้น sb_secret_)');
+  if (r.status === 400 && msg.includes('ไม่พบรายการจ่าย'))
+    return setLamp('admin', 'bad', msg, 'ข้อมูลในฐานข้อมูลไม่ใช่ชุดเริ่มต้น ให้ reset ด้วย schema → seed → sell_drug → crud');
+  if (r.status === 200) return setLamp('admin', 'bad', 'D0014 ถูกยกเลิกได้ ซึ่งไม่ควรเกิด',
+    'ฐานข้อมูลไม่มีกฎห้ามยกเลิกรายการที่มีอุบัติการณ์ รัน crud.sql ฉบับล่าสุด แล้ว reset ข้อมูล');
+  setLamp('admin', 'bad', `ได้ ${r.status} ${msg}`, 'ตรวจ Logs ของ deploy ใน Vercel');
+}
+
+// ---------- ปุ่มตรวจ ----------
+const runBtn = document.getElementById('run');
+runBtn.addEventListener('click', async () => {
+  runBtn.disabled = true;
+  document.getElementById('summary').textContent = '';
+  CHECKS.forEach(c => setLamp(c.id, 'wait'));
+  const data = await checkData();
+  checkCatalog(data);
+  await checkDispense();
+  await checkGuard();
+  await checkAdmin(document.getElementById('c-guard').classList.contains('ok'));
+  const ok = document.querySelectorAll('.check.ok').length;
+  document.getElementById('summary').textContent =
+    ok === CHECKS.length ? 'ผ่านครบ 5 ดวง พร้อมสร้าง admin.html' : `ผ่าน ${ok} จาก ${CHECKS.length} ดวง`;
+  runBtn.disabled = false;
+});
+document.getElementById('code').addEventListener('keydown', e => { if (e.key === 'Enter') runBtn.click(); });
+
+// ---------- เตือนเมื่อเปิดผิดที่ ----------
+const where = document.getElementById('where');
+const h = location.hostname;
+if (location.protocol === 'file:') {
+  where.textContent = 'หน้านี้ถูกเปิดจากไฟล์ในเครื่อง ตรวจ API ไม่ได้ ให้ push ขึ้น GitHub แล้วเปิดผ่านลิงก์ https://<ชื่อโปรเจกต์>.vercel.app/status.html';
+  where.classList.add('show');
+} else if (h.endsWith('github.io')) {
+  where.textContent = 'หน้านี้เปิดจาก GitHub Pages ซึ่งไม่รันไฟล์ในโฟลเดอร์ api/ ไฟจะเป็นสีแดงทั้งหมด ให้เปิดผ่านลิงก์ vercel.app แทน';
+  where.classList.add('show');
+} else if (h === '127.0.0.1' || h === 'localhost') {
+  where.textContent = 'หน้านี้เปิดในเครื่อง ถ้าใช้ Live Server ไฟจะแดงเพราะไม่มี API ให้เปิดผ่านลิงก์ vercel.app (ถ้าใช้ vercel dev กดตรวจทั้งหมดได้ตามปกติ)';
+  where.classList.add('show');
+} else {
+  runBtn.click();  // เปิดบน Vercel แล้วตรวจดวง 1-4 ให้ทันที
+}
+</script>
+</body>
+</html>
