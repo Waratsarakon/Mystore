@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#121212">
+  <title>Workshop ร้านยาจำลอง</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
+    :root { color-scheme: dark; --background:#121212; --card:#181818; --white:#fff; --muted:#b3b3b3; --accent:#1ed760; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; padding:28px 18px; background:var(--background); color:var(--white); font-family:"Noto Sans Thai",sans-serif; font-size:16px; }
+    main { width:min(100%,680px); margin:0 auto; }
+    header { margin:12px 0 28px; }
+    h1 { margin:0 0 8px; font-size:clamp(26px,6vw,34px); line-height:1.35; font-weight:700; }
+    .subtitle { margin:0; color:var(--muted); line-height:1.7; }
+    nav { display:grid; gap:14px; }
+    .nav-link { display:flex; min-height:88px; align-items:center; justify-content:space-between; gap:16px; padding:18px 20px; border:1px solid #292929; border-radius:14px; background:var(--card); color:var(--white); text-decoration:none; transition:border-color .15s ease,transform .15s ease,background .15s ease; -webkit-tap-highlight-color:transparent; }
+    .nav-link:hover,.nav-link:focus-visible { border-color:var(--accent); background:#1d241f; outline:none; }
+    .nav-link:active { transform:scale(.99); }
+    .link-copy { min-width:0; }
+    .link-title { display:block; margin-bottom:4px; font-size:18px; line-height:1.45; font-weight:700; }
+    .link-desc { display:block; color:var(--muted); font-size:14px; line-height:1.6; }
+    .arrow { flex:0 0 auto; color:var(--accent); font-size:25px; line-height:1; }
+    footer { margin-top:26px; padding:14px 16px; border:1px solid #343434; border-radius:12px; color:var(--muted); font-size:14px; line-height:1.7; text-align:center; }
+    @media (min-width:600px) { body { padding-top:48px; } .nav-link { min-height:92px; padding:20px 24px; } .link-title { font-size:19px; } .link-desc { font-size:15px; } }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none!important; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Workshop ร้านยาจำลอง</h1>
+      <p class="subtitle">เลือกเมนูที่ต้องการใช้งาน</p>
+    </header>
+    <nav id="main-menu" aria-label="เมนูหลัก"></nav>
+    <footer>ข้อมูลทั้งหมดเป็นข้อมูลจำลอง ห้ามใส่ชื่อผู้ป่วยจริง</footer>
+  </main>
+  <script>
+    // เพิ่มหรือลบเมนูได้โดยแก้รายการเพียงบรรทัดเดียวในอาร์เรย์นี้
+    const links = [
+      { href:"pos.html", title:"หน้าขายยา", desc:"เลือกยา กรอกจำนวน บันทึกการจ่ายยา" },
+      { href:"admin.html", title:"จัดการระบบ (ผู้ดูแล)", desc:"บัญชียา คลังรายล็อต รายการจ่าย ต้องใช้รหัสผู้ดูแล" },
+      { href:"dashboard.html", title:"Dashboard คลังยา", desc:"ภาพรวมคลัง ล็อตใกล้หมดอายุ ยาต่ำกว่าจุดสั่งซื้อ" },
+      { href:"status.html", title:"ตรวจสถานะระบบ", desc:"ตรวจว่าการเชื่อมต่อแต่ละส่วนทำงานปกติ" }
+    ];
+
+    const menu = document.getElementById("main-menu");
+    links.forEach(({ href, title, desc }) => {
+      const link = document.createElement("a");
+      link.className = "nav-link";
+      link.href = href;
+
+      const copy = document.createElement("span");
+      copy.className = "link-copy";
+      const heading = document.createElement("span");
+      heading.className = "link-title";
+      heading.textContent = title;
+      const description = document.createElement("span");
+      description.className = "link-desc";
+      description.textContent = desc;
+      const arrow = document.createElement("span");
+      arrow.className = "arrow";
+      arrow.setAttribute("aria-hidden", "true");
+      arrow.textContent = "›";
+
+      copy.append(heading, description);
+      link.append(copy, arrow);
+      menu.append(link);
+    });
+  </script>
+</body>
+</html>
